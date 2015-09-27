@@ -303,6 +303,7 @@ MonoBehaviour:
   - {fileID: 495214, guid: 3e27c1eead77d441eb52cc53c82d3d7f, type: 2}
   - {fileID: 447072, guid: 11c6769a0aa634bbca094b49ca043fc8, type: 2}
   - {fileID: 483682, guid: 1e53561857ace45b3a30b843262e2d3d, type: 2}
+  particleSystem: {fileID: 440598, guid: 524ecd1c3a6604e2daa9c5d2bb640eac, type: 2}
 --- !u!212 &21213614
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -474,6 +475,10 @@ Prefab:
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: particleSystem
+      value: 
+      objectReference: {fileID: 440598, guid: 524ecd1c3a6604e2daa9c5d2bb640eac, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 117150}

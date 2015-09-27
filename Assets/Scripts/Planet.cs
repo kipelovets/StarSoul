@@ -9,14 +9,17 @@ public class Planet : MonoBehaviour
 	public Sun sun;
 	public Transform atmosphere;
 	public Transform[] creatures;
+	public Transform particleSystem;
 	
 	private List<Transform> life;
 	private float atmosphereScale;
+	private Dictionary<int, int> stats;
 
 	// Use this for initialization
 	void Start () 
 	{
 		life = new List<Transform>();
+		stats = new Dictionary<int, int>();
 		InvokeRepeating("Breed", 1f, 0.6f);
 		InvokeRepeating("Spawn", 1f, 1f);
 		InvokeRepeating("Die", 1f, 1.3f);
@@ -30,6 +33,11 @@ public class Planet : MonoBehaviour
 				AddCreature(creatures[creatureCount.Key]);
 			}
 		}
+	}
+	
+	public Dictionary<int, int> SerializeLife()
+	{
+		return stats;
 	}
 	
 	// Update is called once per frame
@@ -65,23 +73,35 @@ public class Planet : MonoBehaviour
 			Debug.Log("DIE");
 			var creature = life[0];
 			life.RemoveAt(0);
+			Instantiate(particleSystem, creature.GetChild(0).position, creature.GetChild(0).rotation);
 			Destroy(creature.gameObject);
+			GameObject.FindObjectOfType<Galaxy>().SuperNova();
 		}
 	}
 	
 	void AddCreature(Transform parent)
 	{
-		var rotationZ = Random.value * 360f; 
-		var creature = (Transform)Instantiate(parent, parent.transform.position, Quaternion.identity);
+		var str = parent.name.Replace("Creature", "").Replace("(Clone)", "");
+		int num = int.Parse(str) - 1;
+		int count = 0;
+		if (stats.ContainsKey(num)) {
+			count = stats[num];
+		}
+		stats[num] = count;
+		
+		var creature = (Transform)Instantiate(parent, parent.transform.position, transform.rotation);
 		creature.SetParent(gameObject.transform);
 		creature.localPosition = Vector3.zero;
-		creature.eulerAngles = new Vector3(0f, 0f, rotationZ);
+		
 		float angle = (Random.Range(0, 2) * 2 - 1);
 		var scale = creature.localScale;
 		scale.y *= -angle;
 		creature.localScale = scale;
 		creature.DOKill();
-		float speed = Random.value * 0.4f + 0.8f; 
+		
+		float speed = Random.value * 0.4f + 0.8f;
+		var rotationZ = Random.value * 360f;
+		creature.eulerAngles = new Vector3(0f, 0f, rotationZ); 
 		creature.DORotate(creature.rotation.eulerAngles + new Vector3(0f, 0f, angle*speed), 0.3f)
 			.SetLoops(-1, LoopType.Incremental);
 		life.Add(creature);

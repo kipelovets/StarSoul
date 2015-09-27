@@ -51,7 +51,7 @@
      <Compile Include="Assets\Scripts\Galaxy.cs" />
      <Compile Include="Assets\Scripts\Gaussian.cs" />
      <Compile Include="Assets\Scripts\Intro.cs" />
-     <Compile Include="Assets\Scripts\ParticleSpiralEffect.cs" />
+     <Compile Include="Assets\Scripts\ParticleSystemAutoDestroy.cs" />
      <Compile Include="Assets\Scripts\Planet.cs" />
      <Compile Include="Assets\Scripts\Star.cs" />
      <Compile Include="Assets\Scripts\Sun.cs" />

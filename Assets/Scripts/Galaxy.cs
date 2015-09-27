@@ -12,6 +12,7 @@ public class Galaxy : MonoBehaviour
 	
 	Transform[] stars;
 	Transform firstStar = null;
+	Star currentStar;
 
 	// Use this for initialization
 	public void Explode() 
@@ -65,12 +66,74 @@ public class Galaxy : MonoBehaviour
 		DOTween.Sequence()
 			.AppendInterval(6f)
 			.OnComplete(() => {
-				firstStar.GetComponent<Star>().Attention();
+				firstStar.GetComponent<Star>().Explode();
 			});
 	}
 	
-	// Update is called once per frame
-	void Update () {
+	public void SetCurrentStar(Star star)
+	{
+		if (currentStar) {
+			currentStar.HidePlanetarySystem();
+		}
+		currentStar = star;
+	}
 	
+	public void SuperNova()
+	{
+		Rect viewportRect = new Rect(0f, 0f, 1f, 1f);
+		var cam = Camera.main;
+		int invisible = -1;
+		int visible = -1;
+		for (var i = 0; i < stars.Length; i++) {
+			if (!stars[i].GetComponent<Star>().CanExplode()) {
+				continue;
+			}
+			var pos = stars[i].position;
+			Vector3 viewportPos = cam.WorldToViewportPoint(pos);
+			stars[i].GetComponent<Collider2D>().enabled = true;
+			if (viewportRect.Contains(viewportPos) && viewportPos.z > 0f) {
+				RaycastHit hit;
+				Ray ray = cam.ScreenPointToRay(cam.transform.position);
+				var direction = pos - cam.transform.position;
+				if (Physics.Raycast(cam.transform.position, direction, out hit)) {
+					visible = i;
+					break;
+				} else {
+					invisible = i;
+				}
+			}
+			stars[i].GetComponent<Collider2D>().enabled = false;
+		}
+		var index = visible != -1 ? visible : invisible;
+		if (index != -1) {
+			stars[index].GetComponent<Star>().Explode();
+		}
+	}
+	
+	private Vector3 dragOrigin;
+	
+	void Update()
+	{
+		if (Input.GetAxis("Mouse ScrollWheel") < 0f) {
+			Debug.Log("SCROLL");
+			if (currentStar) {
+				currentStar.HidePlanetarySystem();
+				currentStar = null;
+				Camera.main.transform.DOMove(Camera.main.transform.position.normalized * 1000f, 0.3f);
+			}
+		}
+		
+		if (Input.GetMouseButtonDown(0))
+        {
+            dragOrigin = Input.mousePosition;
+            return;
+        }
+ 
+        if (!Input.GetMouseButton(0)) return;
+ 
+        Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+        Vector3 move = new Vector3(pos.x * 2f, 0, pos.y * 2f);
+ 
+        transform.Translate(move, Space.World); 
 	}
 }
