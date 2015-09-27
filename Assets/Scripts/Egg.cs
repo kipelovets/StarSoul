@@ -15,6 +15,22 @@ public class Egg : MonoBehaviour
 	
 	IEnumerator Grow() 
 	{
+		yield return StartCoroutine(YieldLines());
+		
+		egg.DOPunchScale(Vector3.one, 1f)
+			.OnComplete(() => {
+				var galaxy = GameObject.Find("Galaxy");
+				galaxy.GetComponent<Galaxy>().Explode();
+				egg.gameObject.SetActive(false);
+			});
+		
+		yield return null;
+	}
+	
+	IEnumerator YieldLines()
+	{
+		yield break; // DEBUG: turned off lines
+		
 		int count = 5;
 		var lines = new Transform[count];
 		for (var i = 0; i < count; i++) {
@@ -33,14 +49,5 @@ public class Egg : MonoBehaviour
 			Destroy(lines[i].gameObject);
 			yield return new WaitForSeconds(0.1f);
 		}
-		
-		egg.DOPunchScale(Vector3.one, 1f)
-			.OnComplete(() => {
-				var galaxy = GameObject.Find("Galaxy");
-				galaxy.GetComponent<Galaxy>().Explode();
-				egg.gameObject.SetActive(false);
-			});
-		
-		yield return null;
 	}
 }

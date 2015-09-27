@@ -1,3 +1,4 @@
-WebBuild
-Temp
-obj
+/Library
+/WebBuild
+/Temp
+/obj

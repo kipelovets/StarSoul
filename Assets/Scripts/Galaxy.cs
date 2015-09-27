@@ -9,10 +9,16 @@ public class Galaxy : MonoBehaviour
 	public float armLength;
 	public int count;
 	public float maxRotationDegrees;
+	
+	Transform[] stars;
+	Transform firstStar = null;
 
 	// Use this for initialization
 	public void Explode() 
 	{
+		Rect viewportRect = new Rect(0f, 0f, 1f, 1f);
+		stars = new Transform[count];
+		
 		for (var i = 0; i < count; i++) {
 			float height = Gaussian.Next(0f, armLength);
 			
@@ -32,6 +38,8 @@ public class Galaxy : MonoBehaviour
 			pos = Quaternion.AngleAxis(50, Vector3.right) * pos;
 			
 			var star = (Transform)Instantiate(starPrefab, pos, Quaternion.identity);
+			star.parent = transform;
+			stars[i] = star;
 			
 			star.DOMove(Vector3.zero, 4f).From().SetEase(Ease.OutQuart);
 			
@@ -40,13 +48,25 @@ public class Galaxy : MonoBehaviour
 				fadeTime = 3.9f;
 			}
 			
-			if (i < count - 1) {
+			if (firstStar == null) {
+				Vector3 viewportPos = Camera.current.WorldToViewportPoint(pos);
+				if (viewportRect.Contains(viewportPos) && viewportPos.z > 0f) {
+					firstStar = star;
+				}
+			}
+			
+			if (star != firstStar) {
 				var seq = DOTween.Sequence();
 				seq.AppendInterval(fadeTime);
 				seq.OnComplete(() => { star.GetComponent<SpriteRenderer>().enabled = false; });
 			}
 		}
 		
+		DOTween.Sequence()
+			.AppendInterval(6f)
+			.OnComplete(() => {
+				firstStar.GetComponent<Star>().Attention();
+			});
 	}
 	
 	// Update is called once per frame
